@@ -26,7 +26,7 @@ jobs:
       - name: Run API container
         run: |
           docker run -d \
-            -p 8080:8080 \
+            -p 8080:8090 \  # Corrigido: mapeia host:8080 para container:8090
             --name fee-service \
             doordash-fee-service
 
@@ -51,9 +51,8 @@ jobs:
           pip install pytest httpx fastapi
 
       - name: Run pytest suite
-       - name: Set PYTHONPATH
-        run: |
-          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest -v
 
       - name: Show container logs (for debugging)

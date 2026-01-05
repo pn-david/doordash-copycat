@@ -21,7 +21,7 @@ jobs:
       - name: Run container
         run: |
           docker run -d \
-            -p 8080:8080 \
+            -p 8080:8090 \  # Corrigido: mapeia host:8080 para container:8090
             --name fee-service \
             doordash-fee-service
 
