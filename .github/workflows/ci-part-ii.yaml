@@ -1,35 +1,28 @@
 name: DoorDash Fee Service CI - Part II (Pytest)
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   build-test-pytest:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Build Docker image
         run: |
           docker build -t doordash-fee-service .
-
       - name: Run API container
         run: |
           docker run -d \
-            -p 8080:8090 \  # Corrigido: mapeia host:8080 para container:8090
+            -p 8080:8090 \
             --name fee-service \
             doordash-fee-service
-
       - name: Wait for API to be ready
         run: |
           echo "Waiting for API to be ready on http://localhost:8080 ..."
@@ -44,24 +37,19 @@ jobs:
           echo "API failed to start ❌"
           docker logs fee-service || true
           exit 1
-
       - name: Install test dependencies
         run: |
           pip install --upgrade pip
           pip install pytest httpx fastapi
-
       - name: Run pytest suite
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: pytest -v
-
       - name: Show container logs (for debugging)
         if: always()
         run: docker logs fee-service || true
-
       - name: Stop and remove container
         if: always()
         run: |
           docker stop fee-service || true
           docker rm fee-service || true
-          docker ps -a
